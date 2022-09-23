@@ -1,15 +1,16 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:mongo_dart/mongo_dart.dart' as M;
+import 'package:mongo_dart/mongo_dart.dart' as m;
 import 'package:only_pay/models/mongodbmodels.dart';
-
 import 'package:only_pay/mongodbconnect.dart';
-
+import 'package:dbcrypt/dbcrypt.dart';
 import '../constant/constants.dart';
+import '../screens/auth.dart';
 
 class Registration extends StatelessWidget {
   var collections;
-  Future<M.DbCollection> connection() async {
+  Future<m.DbCollection> connection() async {
     var db = await MongoDB.connect();
     collections = db.collection(COLLECTION_NAME);
     return collections;
@@ -23,13 +24,15 @@ class Registration extends StatelessWidget {
     if (userNameController.text.isNotEmpty &&
         loginController.text.isNotEmpty &&
         passwordController.text.isNotEmpty) {
-      var _id = M.ObjectId();
+      var _id = m.ObjectId();
       final data = MongoDbModel(
         id: _id,
         username: userNameController.text,
         login: loginController.text,
-        password: passwordController.text,
-        createTime: DateTime.now(),
+        password:
+            DBCrypt().hashpw(passwordController.text, DBCrypt().gensalt()),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
         v: 0,
       );
       var result = await MongoDB.insert(data, collections);
@@ -38,7 +41,7 @@ class Registration extends StatelessWidget {
       _clearAll();
     } else {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Заполните все поля!')));
+          .showSnackBar(const SnackBar(content: Text('Заполните все поля!')));
     }
   }
 
@@ -54,43 +57,96 @@ class Registration extends StatelessWidget {
       future: connection(),
       builder: ((context, snapshot) {
         if (snapshot.hasData) {
-          return SafeArea(
-            child: Scaffold(
-              body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextField(
-                      controller: userNameController,
-                      decoration:
-                          const InputDecoration(labelText: 'Имя пользователя'),
+          return Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextField(
+                    controller: userNameController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.person_outline),
+                      labelText: 'Имя пользователя',
+                      fillColor: Colors.blueGrey,
+                      labelStyle: TextStyle(color: Colors.blueGrey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      filled: false,
                     ),
-                    const SizedBox(
-                      height: 25,
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  TextField(
+                    controller: loginController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.login),
+                      labelText: 'Логин',
+                      fillColor: Colors.blueGrey,
+                      labelStyle: TextStyle(color: Colors.blueGrey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      filled: false,
                     ),
-                    TextField(
-                        controller: loginController,
-                        decoration: const InputDecoration(labelText: 'Логин')),
-                    const SizedBox(
-                      height: 25,
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.password),
+                      labelText: 'Пароль',
+                      fillColor: Colors.blueGrey,
+                      labelStyle: TextStyle(color: Colors.blueGrey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      filled: false,
                     ),
-                    TextField(
-                        controller: passwordController,
-                        decoration: const InputDecoration(labelText: 'Пароль')),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    MaterialButton(
-                      onPressed: (() => insertData(
-                          userNameController.text,
-                          loginController.text,
-                          passwordController.text,
-                          context)),
-                      child: const Text('Зарегестрироваться'),
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  CupertinoButton(
+                    onPressed: (() => insertData(
+                        userNameController.text,
+                        loginController.text,
+                        passwordController.text,
+                        context)),
+                    child: const Text('Зарегестрироваться'),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  RichText(
+                    text: TextSpan(children: <TextSpan>[
+                      const TextSpan(
+                          text: "Есть аккаунт? ",
+                          style: TextStyle(color: Colors.blueGrey)),
+                      TextSpan(
+                          text: "Авторизоваться.",
+                          style: TextStyle(color: Colors.blue),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Auth()));
+                            }),
+                    ]),
+                  ),
+                ],
               ),
             ),
           );

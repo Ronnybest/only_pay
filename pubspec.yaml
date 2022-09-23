@@ -37,6 +37,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   mongo_dart: ^0.7.4+1
+  dbcrypt: ^2.0.0
+  textfields: ^0.0.3
+  font_awesome_flutter: ^10.2.1
 
 dev_dependencies:
   flutter_test:

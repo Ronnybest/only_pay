@@ -17,7 +17,8 @@ class MongoDbModel {
     required this.username,
     required this.login,
     required this.password,
-    required this.createTime,
+    required this.createdAt,
+    required this.updatedAt,
     required this.v,
   });
 
@@ -25,8 +26,8 @@ class MongoDbModel {
   String username;
   String login;
   String password;
-  DateTime createTime;
-  //DateTime updatedTime;
+  DateTime createdAt;
+  DateTime updatedAt;
   int v;
 
   factory MongoDbModel.fromJson(Map<String, dynamic> json) => MongoDbModel(
@@ -34,8 +35,9 @@ class MongoDbModel {
         username: json["username"],
         login: json["login"],
         password: json["password"],
-        createTime: json["createTime"],
-        v: json["v"],
+        createdAt: json["createdAt"],
+        updatedAt: json["updatedAt"],
+        v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -43,7 +45,8 @@ class MongoDbModel {
         "username": username,
         "login": login,
         "password": password,
-        "createTime": createTime,
-        "v": v,
+        "createAt": createdAt,
+        "updatedAt": updatedAt,
+        "__v": v,
       };
 }
