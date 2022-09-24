@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class Auth extends StatelessWidget {
   var loginController = TextEditingController();
   var passwordController = TextEditingController();
+
+  Auth({super.key});
 
   @override
   Widget build(BuildContext context) {

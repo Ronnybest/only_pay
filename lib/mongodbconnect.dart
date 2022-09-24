@@ -18,7 +18,6 @@ class MongoDB {
       var result = await collectionName.insertOne(data.toJson());
       return result.isSuccess ? 'Data insert' : 'Something wrong with insert';
     } catch (e) {
-      print(e.toString());
       return e.toString();
     }
   }
