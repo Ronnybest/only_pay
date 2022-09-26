@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:only_pay/cubit/auth_cubit.dart';
 import 'package:only_pay/cubit/registration_cubit.dart';
+import 'package:only_pay/user_repository.dart';
 import '../constant/constants.dart';
 import '../screens/auth.dart';
 
@@ -143,7 +145,10 @@ class InitialWidget extends StatelessWidget {
               password: passwordController.text,
               collectionName: COLLECTION_NAME,
               context: context)),
-          child: const Text('Зарегестрироваться'),
+          child: const Text(
+            'Зарегестрироваться',
+            style: TextStyle(fontFamily: 'Arial'),
+          ),
         ),
         const SizedBox(
           height: 15,
@@ -158,8 +163,14 @@ class InitialWidget extends StatelessWidget {
                 style: const TextStyle(color: Colors.blue),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Auth()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BlocProvider(
+                                  create: (context) =>
+                                      AuthCubit(ConnectAndRegistr()),
+                                  child: Auth(),
+                                )));
                   }),
           ]),
         ),

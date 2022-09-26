@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:only_pay/cubit/auth_cubit.dart';
 import 'package:only_pay/cubit/registration_cubit.dart';
+import 'package:only_pay/screens/auth.dart';
 import 'package:only_pay/screens/registration.dart';
 import 'package:only_pay/user_repository.dart';
 
@@ -16,9 +18,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BlocProvider(
-        create: (context) => RegistrationCubit(ConnectAndRegistr()),
-        child: Registration(),
+      theme: ThemeData(brightness: Brightness.dark),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AuthCubit(ConnectAndRegistr())),
+        ],
+        child: Auth(),
       ),
     );
   }

@@ -21,4 +21,16 @@ class MongoDB {
       return e.toString();
     }
   }
+
+  static Future<dynamic> getPass(
+      DbCollection collectionName, String login) async {
+    try {
+      dynamic result = await collectionName
+          .find(where.eq('login', login).fields(['password']))
+          .toList();
+      return result;
+    } catch (e) {
+      return new List.empty();
+    }
+  }
 }

@@ -14,8 +14,8 @@ class AuthLoading extends AuthState {
 }
 
 class AuthLoaded extends AuthState {
-  final MongoDbModel mongoDbModel;
-  const AuthLoaded(this.mongoDbModel);
+  final List<Map<String, dynamic>> result;
+  const AuthLoaded(this.result);
 }
 
 class AuthError extends AuthState {

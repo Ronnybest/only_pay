@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:bcrypt/bcrypt.dart';
 import 'package:dbcrypt/dbcrypt.dart';
 import 'package:mongo_dart/mongo_dart.dart' as m;
 import 'package:flutter/material.dart';
@@ -7,15 +10,28 @@ import 'mongodbconnect.dart';
 abstract class UserRepository {
   Future<MongoDbModel> connect(String userName, String login, String password,
       BuildContext context, String collectionName);
-  Future<MongoDbModel> auth(String login, String password, BuildContext context,
-      String collectionName);
+  Future<List<Map<String, dynamic>>> auth(String login, String password,
+      BuildContext context, String collectionName);
 }
 
 class ConnectAndRegistr implements UserRepository {
   @override
-  Future<MongoDbModel> auth(String login, String password, BuildContext context,
-      String collectionName) {
+  Future<List<Map<String, dynamic>>> auth(String login, String password,
+      BuildContext context, String collectionName) async {
     if (login.isNotEmpty && password.isNotEmpty) {
+      var db = await MongoDB.connect();
+      var collections = db.collection(collectionName);
+      dynamic userPass = await MongoDB.getPass(collections, login);
+      String hashedPassInput = BCrypt.hashpw(password, BCrypt.gensalt());
+      print(hashedPassInput);
+      print(userPass[0]['password']);
+      bool isCorrect = BCrypt.checkpw(password, userPass[0]["password"]);
+      if (isCorrect) {
+        var data = collections.find(m.where.eq('login', login)).toList();
+        return data;
+      } else {
+        throw AuthException(202).checkCode();
+      }
     } else {
       throw AuthException(0).checkCode();
     }
@@ -32,7 +48,7 @@ class ConnectAndRegistr implements UserRepository {
         id: id,
         username: userName,
         login: login,
-        password: DBCrypt().hashpw(password, DBCrypt().gensalt()),
+        password: BCrypt.hashpw(password, BCrypt.gensalt()),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         v: 0,
@@ -58,7 +74,7 @@ class AuthException implements Exception {
         }
       case 202:
         {
-          return 'Wrong password';
+          return 'Wrong login or password';
         }
       case 0:
         {
