@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:only_pay/cubit/auth_cubit.dart';
-import 'package:only_pay/cubit/registration_cubit.dart';
 import 'package:only_pay/screens/auth.dart';
-import 'package:only_pay/screens/registration.dart';
 import 'package:only_pay/user_repository.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   runApp(const MyApp());

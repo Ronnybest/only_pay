@@ -13,8 +13,9 @@ class Registration extends StatelessWidget {
   var userNameController = TextEditingController();
   var loginController = TextEditingController();
   var passwordController = TextEditingController();
+  final storage;
 
-  Registration({super.key});
+  Registration({super.key, this.storage});
 
   void _clearAll() {
     userNameController.text = '';
@@ -67,11 +68,13 @@ class Registration extends StatelessWidget {
 }
 
 class InitialWidget extends StatelessWidget {
+  final storage;
   const InitialWidget({
     super.key,
     required this.userNameController,
     required this.loginController,
     required this.passwordController,
+    this.storage,
   });
 
   final TextEditingController userNameController;

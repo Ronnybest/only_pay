@@ -7,14 +7,14 @@ class AuthCubit extends Cubit<AuthState> {
   final UserRepository _userRepository;
   AuthCubit(this._userRepository) : super(const AuthInitial());
   Future<void> registration(String login, String password, BuildContext context,
-      String collectionName) async {
+      String collectionName, var storage) async {
     try {
       emit(const AuthLoading());
-      final List<Map<String, dynamic>> result =
-          await _userRepository.auth(login, password, context, collectionName);
+      final List<Map<String, dynamic>> result = await _userRepository.auth(
+          login, password, context, collectionName, storage);
       emit(AuthLoaded(result));
-    } on AuthException {
-      emit(AuthError(''));
+    } on RegException {
+      emit(AuthError('Ошибка авторизации'));
     }
   }
 }
