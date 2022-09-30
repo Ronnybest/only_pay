@@ -14,7 +14,7 @@ class AuthLoading extends AuthState {
 }
 
 class AuthLoaded extends AuthState {
-  final List<Map<String, dynamic>> result;
+  final Map<String, dynamic>? result;
   const AuthLoaded(this.result);
 }
 

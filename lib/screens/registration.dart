@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:only_pay/cubit/auth_cubit.dart';
 import 'package:only_pay/cubit/registration_cubit.dart';
+import 'package:only_pay/screens/home.dart';
 import 'package:only_pay/user_repository.dart';
 import '../constant/constants.dart';
 import '../screens/auth.dart';
@@ -34,8 +35,8 @@ class Registration extends StatelessWidget {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(state.message)));
             } else if (state is RegistrationLoaded) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(state.mongoDbModel.id.$oid.toString())));
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.mongoDbModel['id'].toString())));
               _clearAll();
             }
           },
@@ -50,10 +51,7 @@ class Registration extends StatelessWidget {
                 body: Center(child: CircularProgressIndicator()),
               );
             } else if (state is RegistrationLoaded) {
-              return InitialWidget(
-                  userNameController: userNameController,
-                  loginController: loginController,
-                  passwordController: passwordController);
+              return MainPage(state.mongoDbModel);
             } else {
               return InitialWidget(
                   userNameController: userNameController,

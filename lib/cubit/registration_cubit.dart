@@ -14,7 +14,7 @@ class RegistrationCubit extends Cubit<RegistrationState> {
       String collectionName, BuildContext context) async {
     try {
       emit(const RegistrationLoading());
-      final MongoDbModel userData = await _userRepository.connect(
+      final Map<String, dynamic> userData = await _userRepository.connect(
           userName, login, password, context, collectionName);
       emit(RegistrationLoaded(userData));
     } on RegException {

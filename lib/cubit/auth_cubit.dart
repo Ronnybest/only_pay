@@ -10,7 +10,7 @@ class AuthCubit extends Cubit<AuthState> {
       String collectionName, var storage) async {
     try {
       emit(const AuthLoading());
-      final List<Map<String, dynamic>> result = await _userRepository.auth(
+      final Map<String, dynamic> result = await _userRepository.auth(
           login, password, context, collectionName, storage);
       emit(AuthLoaded(result));
     } on RegException {

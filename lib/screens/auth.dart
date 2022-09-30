@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:only_pay/constant/constants.dart';
 import 'package:only_pay/cubit/auth_cubit.dart';
 import 'package:only_pay/cubit/registration_cubit.dart';
+import 'package:only_pay/screens/home.dart';
 import 'package:only_pay/screens/registration.dart';
 import 'package:only_pay/user_repository.dart';
 
@@ -48,8 +49,8 @@ class _AuthState extends State<Auth> {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(state.message)));
             } else if (state is AuthLoaded) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(state.result[0]['username'].toString())));
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.result!['username'])));
               _clearAll();
             }
           },
@@ -65,11 +66,7 @@ class _AuthState extends State<Auth> {
                 body: Center(child: CircularProgressIndicator()),
               );
             } else if (state is AuthLoaded) {
-              return InitialView(
-                loginController: loginController,
-                passwordController: passwordController,
-                storage: storage,
-              );
+              return MainPage(state.result);
             } else {
               return InitialView(
                 loginController: loginController,

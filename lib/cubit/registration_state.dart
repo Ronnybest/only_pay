@@ -15,7 +15,7 @@ class RegistrationLoading extends RegistrationState {
 }
 
 class RegistrationLoaded extends RegistrationState {
-  final MongoDbModel mongoDbModel;
+  final Map<String, dynamic> mongoDbModel;
   const RegistrationLoaded(this.mongoDbModel);
 
   // @override
