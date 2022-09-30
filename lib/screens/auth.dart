@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:only_pay/constant/constants.dart';
 import 'package:only_pay/cubit/auth_cubit.dart';
+import 'package:only_pay/cubit/posts_cubit.dart';
 import 'package:only_pay/cubit/registration_cubit.dart';
 import 'package:only_pay/screens/home.dart';
 import 'package:only_pay/screens/registration.dart';
 import 'package:only_pay/user_repository.dart';
+
+import '../user_main_page_functions.dart';
 
 // ignore: must_be_immutable
 class Auth extends StatefulWidget {
@@ -41,41 +44,41 @@ class _AuthState extends State<Auth> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: BlocConsumer<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state is AuthError) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-            } else if (state is AuthLoaded) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.result!['username'])));
-              _clearAll();
-            }
-          },
-          builder: (context, state) {
-            if (state is AuthInitial) {
-              return InitialView(
-                loginController: loginController,
-                passwordController: passwordController,
-                storage: storage,
-              );
-            } else if (state is AuthLoading) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            } else if (state is AuthLoaded) {
-              return MainPage(state.result);
-            } else {
-              return InitialView(
-                loginController: loginController,
-                passwordController: passwordController,
-                storage: storage,
-              );
-            }
-          },
-        ),
+      body: BlocConsumer<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthError) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.message)));
+          } else if (state is AuthLoaded) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.result!['username'])));
+            _clearAll();
+          }
+        },
+        builder: (context, state) {
+          if (state is AuthInitial) {
+            return InitialView(
+              loginController: loginController,
+              passwordController: passwordController,
+              storage: storage,
+            );
+          } else if (state is AuthLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          } else if (state is AuthLoaded) {
+            return BlocProvider(
+              create: (context) => PostsCubit(ActionsWithPosts()),
+              child: MainPage(state.result),
+            );
+          } else {
+            return InitialView(
+              loginController: loginController,
+              passwordController: passwordController,
+              storage: storage,
+            );
+          }
+        },
       ),
     );
   }
@@ -106,91 +109,94 @@ class _InitialViewState extends State<InitialView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextField(
-          controller: widget.loginController,
-          // initialValue:
-          //     storage.read(key: 'lgn').toString() ?? loginController.text,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.login),
-            labelText: 'Логин',
-            fillColor: Colors.blueGrey,
-            labelStyle: TextStyle(color: Colors.blueGrey),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(20),
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextField(
+            controller: widget.loginController,
+            // initialValue:
+            //     storage.read(key: 'lgn').toString() ?? loginController.text,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.login),
+              labelText: 'Логин',
+              fillColor: Colors.blueGrey,
+              labelStyle: TextStyle(color: Colors.blueGrey),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20),
+                ),
               ),
+              filled: false,
             ),
-            filled: false,
           ),
-        ),
-        const SizedBox(
-          height: 25,
-        ),
-        TextField(
-          controller: widget.passwordController,
-          obscureText: true,
-          // initialValue:
-          //     storage.read(key: 'pswrd').toString() ?? loginController.text,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.password),
-            labelText: 'Пароль',
-            fillColor: Colors.blueGrey,
-            labelStyle: TextStyle(color: Colors.blueGrey),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(20),
+          const SizedBox(
+            height: 25,
+          ),
+          TextField(
+            controller: widget.passwordController,
+            obscureText: true,
+            // initialValue:
+            //     storage.read(key: 'pswrd').toString() ?? loginController.text,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.password),
+              labelText: 'Пароль',
+              fillColor: Colors.blueGrey,
+              labelStyle: TextStyle(color: Colors.blueGrey),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20),
+                ),
               ),
+              filled: false,
             ),
-            filled: false,
           ),
-        ),
-        CupertinoButton(
-          child: Text("Вставить данные для авторизации"),
-          onPressed: () {
-            insertAuthData(
-                login: widget.loginController,
-                pass: widget.passwordController,
-                storage: widget.storage);
-          },
-        ),
-        CupertinoButton(
-          child: Text('Авторизоваться'),
-          onPressed: () => auth(
-              collectionName: COLLECTION_NAME,
-              context: context,
-              login: widget.loginController.text,
-              password: widget.passwordController.text),
-        ),
-        RichText(
-          text: TextSpan(
-            children: <TextSpan>[
-              const TextSpan(
-                  text: "Нет аккаунта? ",
-                  style: TextStyle(color: Colors.blueGrey)),
-              TextSpan(
-                text: "Зарегестрироваться.",
-                style: const TextStyle(color: Colors.blue),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider(
-                          create: (context) =>
-                              RegistrationCubit(ConnectAndRegistr()),
-                          child: Registration(),
+          CupertinoButton(
+            child: Text("Вставить данные для авторизации"),
+            onPressed: () {
+              insertAuthData(
+                  login: widget.loginController,
+                  pass: widget.passwordController,
+                  storage: widget.storage);
+            },
+          ),
+          CupertinoButton(
+            child: Text('Авторизоваться'),
+            onPressed: () => auth(
+                collectionName: COLLECTION_NAME,
+                context: context,
+                login: widget.loginController.text,
+                password: widget.passwordController.text),
+          ),
+          RichText(
+            text: TextSpan(
+              children: <TextSpan>[
+                const TextSpan(
+                    text: "Нет аккаунта? ",
+                    style: TextStyle(color: Colors.blueGrey)),
+                TextSpan(
+                  text: "Зарегестрироваться.",
+                  style: const TextStyle(color: Colors.blue),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (context) =>
+                                RegistrationCubit(ConnectAndRegistr()),
+                            child: Registration(),
+                          ),
                         ),
-                      ),
-                    );
-                  },
-              ),
-            ],
+                      );
+                    },
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

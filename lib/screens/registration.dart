@@ -7,7 +7,9 @@ import 'package:only_pay/cubit/registration_cubit.dart';
 import 'package:only_pay/screens/home.dart';
 import 'package:only_pay/user_repository.dart';
 import '../constant/constants.dart';
+import '../cubit/posts_cubit.dart';
 import '../screens/auth.dart';
+import '../user_main_page_functions.dart';
 
 // ignore: must_be_immutable
 class Registration extends StatelessWidget {
@@ -51,7 +53,10 @@ class Registration extends StatelessWidget {
                 body: Center(child: CircularProgressIndicator()),
               );
             } else if (state is RegistrationLoaded) {
-              return MainPage(state.mongoDbModel);
+              return BlocProvider(
+                create: (context) => PostsCubit(ActionsWithPosts()),
+                child: MainPage(state.mongoDbModel),
+              );
             } else {
               return InitialWidget(
                   userNameController: userNameController,
