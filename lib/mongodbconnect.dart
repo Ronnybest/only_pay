@@ -33,4 +33,13 @@ class MongoDB {
       return new List.empty();
     }
   }
+
+  static Future<dynamic> getAllPosts(DbCollection collectionName) async {
+    try {
+      dynamic result = await collectionName.find().toList();
+      return result;
+    } catch (e) {
+      return e.toString();
+    }
+  }
 }

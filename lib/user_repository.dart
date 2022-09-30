@@ -3,7 +3,6 @@ import 'package:mongo_dart/mongo_dart.dart' as m;
 import 'package:flutter/material.dart';
 import 'models/mongodbmodels.dart';
 import 'mongodbconnect.dart';
-import 'dart:convert';
 
 abstract class UserRepository {
   Future<Map<String, dynamic>> connect(String userName, String login,
@@ -20,9 +19,6 @@ class ConnectAndRegistr implements UserRepository {
       var db = await MongoDB.connect();
       var collections = db.collection(collectionName);
       dynamic userPass = await MongoDB.getPass(collections, login);
-      //String hashedPassInput = BCrypt.hashpw(password, BCrypt.gensalt());
-      //print(hashedPassInput);
-      //print(userPass[0]['password']);
       bool isCorrect = false;
       if (userPass.isNotEmpty) {
         isCorrect = BCrypt.checkpw(password, userPass[0]["password"]);
